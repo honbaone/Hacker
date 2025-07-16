@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM BREACHED</title>
+    <style>
+        :root {
+            --background-color: #000;
+            --text-color: #00ff41;
+            --danger-color: #ff0000;
+            --highlight-color: #faff00;
+        }
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #matrix {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        #hacker-content {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--text-color);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.5);
+            padding: 20px;
+            font-size: 1em; /* Điều chỉnh cho mobile */
+            line-height: 1.7;
+            max-height: 90vh;
+            overflow-y: auto; /* Cho phép cuộn nếu nội dung quá dài */
+        }
+        .cursor {
+            display: inline-block;
+            background-color: var(--text-color);
+            width: 10px;
+            height: 1em;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            from, to { background-color: transparent }
+            50% { background-color: var(--text-color); }
+        }
+        #final-message {
+            color: var(--highlight-color);
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-shadow: 0 0 10px var(--highlight-color);
+            display: none;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+    <div id="overlay">
+        <div id="hacker-content">
+            <div id="output"></div>
+            <span class="cursor"></span>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const alphabet = 'アァカサタナハマヤャラワガザダバパイキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const rainDrops = Array.from({ length: columns }).map(() => 1);
+
+        const drawMatrix = () => {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim();
+            ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        };
+        setInterval(drawMatrix, 33);
+
+        const outputDiv = document.getElementById('output');
+        const contentBox = document.getElementById('hacker-content');
+
+        function typeLine(line, element, callback) {
+            let i = 0;
+            const typing = setInterval(() => {
+                if (i < line.length) {
+                    element.innerHTML += line.charAt(i);
+                    i++;
+                    contentBox.scrollTop = contentBox.scrollHeight; // Tự động cuộn xuống
+                } else {
+                    clearInterval(typing);
+                    element.innerHTML += '<br>';
+                    if (callback) callback();
+                }
+            }, 30);
+        }
+
+        async function startHack() {
+            let currentLine = document.createElement('span');
+            outputDiv.appendChild(currentLine);
+
+            const linesToType = [
+                "> Establishing secure connection...",
+                "> Connection successful. Encrypting traffic.",
+                "> Running vulnerability scan on target network...",
+                "...",
+                "> Found open port: 443 (HTTPS)",
+                "> Bypassing firewall...",
+                "> Firewall disabled. [SUCCESS]",
+                "> Injecting payload: Trojan.JS.Redirector",
+                "> Payload injected. Gaining root access...",
+                "> ROOT ACCESS GRANTED. Kernel control established.",
+                "> Reading system data...",
+            ];
+
+            function runSequence(index) {
+                if (index < linesToType.length) {
+                    typeLine(linesToType[index], currentLine, () => {
+                        currentLine = document.createElement('span');
+                        outputDiv.appendChild(currentLine);
+                        runSequence(index + 1);
+                    });
+                } else {
+                    fetchAndDisplayInfo();
+                }
+            }
+            runSequence(0);
+        }
+
+        async function fetchAndDisplayInfo() {
+            let currentLine = document.createElement('span');
+            outputDiv.appendChild(currentLine);
+            try {
+                const response = await fetch('https://ipinfo.io/json?token=94bcde48dfa30d');
+                const data = await response.json();
+                
+                // Xác định hệ điều hành cho thân thiện hơn
+                let osName = navigator.platform;
+                const userAgent = navigator.userAgent;
+                if (userAgent.indexOf("Win") != -1) osName = "Windows";
+                if (userAgent.indexOf("Mac") != -1) osName = "MacOS";
+                if (userAgent.indexOf("iPhone") != -1 || userAgent.indexOf("iPad") != -1) osName = "iOS";
+                if (userAgent.indexOf("Android") != -1) osName = "Android";
+                if (userAgent.indexOf("Linux") != -1 && osName !== "Android") osName = "Linux";
+
+
+                const infoLines = [
+                    `> Target IP Address: ${data.ip}`,
+                    `> Location.........: ${data.city}, ${data.country}`,
+                    `> ISP..............: ${data.org}`,
+                    `> Device OS........: ${osName}`,
+                    `> CPU Cores........: ${navigator.hardwareConcurrency || 'N/A'}`,
+                    `> RAM (Approx.).....: ${navigator.deviceMemory || 'N/A'} GB`,
+                    `> Screen Resolution: ${screen.width}x${screen.height}`,
+                    `> Current Time.....: ${new Date().toLocaleString('vi-VN')}`,
+                    "> DATA EXTRACTION COMPLETE.",
+                    ">",
+                ];
+
+                function runInfoSequence(index) {
+                    if (index < infoLines.length) {
+                        typeLine(infoLines[index], currentLine, () => {
+                            currentLine = document.createElement('span');
+                            outputDiv.appendChild(currentLine);
+                            runInfoSequence(index + 1);
+                        });
+                    } else {
+                        const finalLine = document.createElement('p');
+                        finalLine.id = 'final-message';
+                        finalLine.innerText = 'Mọi thông tin của bạn đã được gửi về cho Hắc Cơ Lỏ hẹ hẹ hẹ :D';
+                        outputDiv.appendChild(finalLine);
+                        finalLine.style.display = 'block';
+                        contentBox.scrollTop = contentBox.scrollHeight;
+                    }
+                }
+                runInfoSequence(0);
+
+            } catch (error) {
+                typeLine("> CONNECTION LOST! Target may have disconnected.", currentLine, null);
+            }
+        }
+        window.onload = startHack;
+    </script>
+</body>
+</html>
